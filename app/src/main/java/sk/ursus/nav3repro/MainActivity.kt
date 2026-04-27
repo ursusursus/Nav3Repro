@@ -1,43 +1,34 @@
 package sk.ursus.nav3repro
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.ContentTransform
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.navigation3.runtime.NavBackStack
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.serialization.NavBackStackSerializer
-import androidx.navigation3.runtime.serialization.NavKeySerializer
-import androidx.navigation3.scene.Scene
+import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import androidx.savedstate.serialization.saved
 import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
-    private val backStack by saved(NavBackStackSerializer(NavKeySerializer())) {
-        NavBackStack<AppNavKey>(HomeNavKey)
-    }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
+            val backStack = rememberNavBackStack(HomeNavKey)
             NavDisplay(
                 backStack = backStack,
                 onBack = {
@@ -45,8 +36,7 @@ class MainActivity : ComponentActivity() {
                         backStack.removeLastOrNull()
                     }
                 },
-                transitionSpec = pushSlideAndFadeTransitionSpec(),
-                popTransitionSpec = popSlideAndFadeTransitionSpec(),
+                sceneStrategies = listOf(AnimatedBottomSheetSceneStrategy()),
                 entryProvider = entryProvider {
                     entry<HomeNavKey> {
                         Box(
@@ -56,31 +46,44 @@ class MainActivity : ComponentActivity() {
                             contentAlignment = Alignment.Center
                         ) {
                             Text("Home")
+                            Button(onClick = { backStack.add(AboutNavKey1) }) {
+                                Text("Go to about 1")
+                            }
                         }
                     }
-                    entry<ProfileNavKey> {
+                    entry<AboutNavKey1>(
+                        metadata = AnimatedBottomSheetSceneStrategy.bottomSheet(),
+                    ) {
                         Box(
                             modifier = Modifier
-                                .fillMaxSize()
+                                .fillMaxWidth()
+                                .height(400.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("About 1")
+                            Button(onClick = {
+                                // backStack.removeLastOrNull()
+                                backStack.add(AboutNavKey2)
+                            }) {
+                                Text("Go to about 2")
+                            }
+                        }
+                    }
+                    entry<AboutNavKey2>(
+                        metadata = AnimatedBottomSheetSceneStrategy.bottomSheet(),
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(400.dp)
                                 .background(Color.Yellow),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("Profile")
+                            Text("About 2")
                         }
                     }
                 }
             )
-        }
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-
-        val uri = intent.data
-        if (uri != null) {
-            if (uri.pathSegments.firstOrNull() == "profile") {
-                backStack.add(ProfileNavKey)
-            }
         }
     }
 }
@@ -91,30 +94,7 @@ interface AppNavKey : NavKey
 data object HomeNavKey : AppNavKey
 
 @Serializable
-data object ProfileNavKey : AppNavKey
+data object AboutNavKey1 : AppNavKey
 
-fun <T : Any> pushSlideAndFadeTransitionSpec(): AnimatedContentTransitionScope<Scene<T>>.() -> ContentTransform = {
-    slideInHorizontally(
-        initialOffsetX = { fullWidth -> fullWidth },
-        animationSpec = tween(durationMillis = 300)
-    ) togetherWith slideOutHorizontally(
-        targetOffsetX = { fullWidth -> -fullWidth / 4 },
-        animationSpec = tween(durationMillis = 300)
-    ) + fadeOut(
-        animationSpec = tween(durationMillis = 300)
-    )
-}
-
-fun <T : Any> popSlideAndFadeTransitionSpec(): AnimatedContentTransitionScope<Scene<T>>.() -> ContentTransform = {
-    slideInHorizontally(
-        initialOffsetX = { fullWidth -> -fullWidth / 4 },
-        animationSpec = tween(durationMillis = 300)
-    ) + fadeIn(
-        animationSpec = tween(durationMillis = 300)
-    ) togetherWith slideOutHorizontally(
-        targetOffsetX = { fullWidth -> fullWidth / 2 },
-        animationSpec = tween(durationMillis = 300)
-    ) + fadeOut(
-        animationSpec = tween(durationMillis = 300)
-    )
-}
+@Serializable
+data object AboutNavKey2 : AppNavKey
