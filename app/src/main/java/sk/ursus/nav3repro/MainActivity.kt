@@ -4,7 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -54,11 +56,12 @@ class MainActivity : ComponentActivity() {
                     entry<AboutNavKey1>(
                         metadata = AnimatedBottomSheetSceneStrategy.bottomSheet(),
                     ) {
-                        Box(
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(400.dp),
-                            contentAlignment = Alignment.Center
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text("About 1")
                             Button(onClick = {
@@ -66,6 +69,12 @@ class MainActivity : ComponentActivity() {
                                 backStack.add(AboutNavKey2)
                             }) {
                                 Text("Go to about 2")
+                            }
+                            Button(onClick = {
+                                // backStack.removeLastOrNull()
+                                backStack.removeLastOrNull()
+                            }) {
+                                Text("Close")
                             }
                         }
                     }
