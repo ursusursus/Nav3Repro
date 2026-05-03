@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
                         backStack.removeLastOrNull()
                     }
                 },
-                sceneStrategies = listOf(AnimatedBottomSheetSceneStrategy()),
+                sceneStrategies = listOf(BottomSheetSceneStrategy()),
                 entryProvider = entryProvider {
                     entry<HomeNavKey> {
                         Box(
@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     entry<AboutNavKey1>(
-                        metadata = AnimatedBottomSheetSceneStrategy.bottomSheet(),
+                        metadata = BottomSheetSceneStrategy.bottomSheet(),
                     ) {
                         Column(
                             modifier = Modifier
@@ -79,12 +79,12 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     entry<AboutNavKey2>(
-                        metadata = AnimatedBottomSheetSceneStrategy.bottomSheet(),
+                        metadata = BottomSheetSceneStrategy.bottomSheet(),
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(400.dp)
+                                .height(200.dp)
                                 .background(Color.Yellow),
                             contentAlignment = Alignment.Center
                         ) {
